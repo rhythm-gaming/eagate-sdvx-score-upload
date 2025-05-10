@@ -35,7 +35,7 @@ async function main() {
     ui.setStatus($('uploading_play_data', index_data_list.length));
 
     const uploader = new Uploader(UPLOAD_URL);
-    await uploader.upload({
+    await uploader.upload('music-data', {
         profile,
         musics: index_data_list,
     });
