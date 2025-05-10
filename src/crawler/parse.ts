@@ -1,4 +1,5 @@
 import { $ } from "@/message";
+import { PageInfo } from "./type";
 
 export function parseVolforce(volforce_str: string|null|undefined): number {
     if(!volforce_str) throw new Error($('error_parse_profile', 'volforce'));
@@ -22,4 +23,19 @@ export function parseAppealCardUrl(appeal_card_url: string): string {
     if(!match) throw new Error($('error_parse_profile', 'appeal_card_url'));
     
     return decodeURIComponent(match[1]);
+}
+
+export function getPageInfo(elem: Element|null|undefined): PageInfo|null {
+    if(!elem) return null;
+
+    let total_pages = 1;
+
+    for(const page_num_elem of elem.querySelectorAll("p.num a span.page_num")) {
+        const page_num = parseInt(page_num_elem.textContent?.trim() ?? "", 10);
+        if(!Number.isSafeInteger(page_num)) continue;
+
+        if(total_pages < page_num) total_pages = page_num;
+    }
+
+    return { total_pages };
 }

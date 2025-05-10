@@ -3,6 +3,7 @@
 /** @import { BuildOptions } from "esbuild"; */
 
 import esbuild from "esbuild";
+import { InlineCSSPlugin } from "./plugin/inline-css.mjs";
 
 export class Builder {
     /** @type {BuildParams} */
@@ -43,6 +44,7 @@ export class Builder {
                 "react/jsx-runtime": "preact/jsx-runtime",
             },
 
+            plugins: this.opt_plugins,
             minify: this.opt_minify,
             sourcemap: this.opt_sourcemap,
         };
@@ -54,6 +56,11 @@ export class Builder {
             case 'prod': return "./dist/upload.js";
         }
     }
+
+    /** @returns {esbuild.Plugin[]} */
+    get opt_plugins() {
+        return [InlineCSSPlugin];
+    };
 
     get opt_minify() {
         switch(this.args.mode) {

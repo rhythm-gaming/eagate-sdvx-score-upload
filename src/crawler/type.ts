@@ -1,6 +1,5 @@
 export interface PageInfo {
     total_pages: number;
-    curr_page: number;
 }
 
 export interface SDVXProfile {
@@ -26,4 +25,23 @@ export interface SDVXProfile {
 
     play_day_combo?: number;
     play_week_combo?: number;
+}
+
+export interface SDVXMusicPlayDataIndexData {
+    music_data: {
+        id: string;
+        title: string;
+        artist: string;
+    };
+    chart_list: Array<{
+        ind: number;
+        mark: string;
+        grade: string;
+        score: number;
+    }>;
+}
+
+export interface SDVXMusicPlayDataIndex {
+    page_info: PageInfo;
+    data_list: SDVXMusicPlayDataIndexData[];
 }
