@@ -3,13 +3,32 @@ name: Build CI
 on: push
 
 jobs:
-    type_check:
-        name: Type Check
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-            - name: Setup pnpm
-              uses: pnpm/action-setup@v4
-            - name: Run Type Check
-              run: pnpm tsc
+  type_check:
+    name: Type Check
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        run_install: true
+    - name: Run Type Check
+      run: pnpm tsc
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        run_install: true
+    - name: Build
+      run: pnpm build --mode=prod
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: upload.js
+        path: dist/upload.js
