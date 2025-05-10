@@ -1,0 +1,1 @@
+export const EAGATE_ORIGIN = "https://p.eagate.573.jp";
