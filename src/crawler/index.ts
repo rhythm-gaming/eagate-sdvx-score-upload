@@ -1,6 +1,6 @@
 import { $ } from "@/message";
 import type { PageInfo, SDVXMusicPlayDataIndex, SDVXMusicPlayDataIndexData, SDVXProfile } from "./type";
-import { getPageInfo, parseAppealCardUrl, parseVolforce } from "./parse";
+import { getPageInfo, getPlayDataIndexData, parseAppealCardUrl, parseVolforce } from "./parse";
 
 async function fetchPages(params: {parallel?: number, onProgress?: (total_pages: number, curr_page: number) => void}, fetchPage: (curr_page: number) => Promise<number>) {
     let total_pages = 1;
@@ -100,14 +100,14 @@ export class Crawler {
 
         return {
             page_info,
-            data_list: [],
+            data_list: [...doc.querySelectorAll("div#playdata div#pc-list tr.data_col")].map((elem) => getPlayDataIndexData(elem)).filter((x) => x != null),
         };
     }
 
     async fetchMusicPlayDataIndexDataList(params: {limit?: number, parallel?: number, onProgress?: (total_pages: number, curr_page: number) => void} = {}): Promise<SDVXMusicPlayDataIndexData[]> {
         const data_list: SDVXMusicPlayDataIndexData[] = [];
 
-        fetchPages(params, async(curr_page) => {
+        await fetchPages(params, async(curr_page) => {
             const data_index = await this.fetchMusicPlayDataIndex({page: curr_page, limit: params.limit});
             data_list.push(...data_index.data_list);
 

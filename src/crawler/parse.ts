@@ -1,5 +1,5 @@
 import { $ } from "@/message";
-import { PageInfo } from "./type";
+import type { PageInfo, SDVXMusicPlayDataIndexData } from "./type";
 
 export function parseVolforce(volforce_str: string|null|undefined): number {
     if(!volforce_str) throw new Error($('error_parse_profile', 'volforce'));
@@ -25,6 +25,20 @@ export function parseAppealCardUrl(appeal_card_url: string): string {
     return decodeURIComponent(match[1]);
 }
 
+export function parseImageUrlPostfix(url: string|null|undefined, needle: string): string|null {
+    if(!url) return null;
+
+    const ind = url.indexOf(needle);
+    if(ind < 0) return null;
+
+    url = url.slice(ind + needle.length);
+    
+    const match = url.match(/^([A-Za-z0-9_\-=]+)/);
+    if(!match) return null;
+
+    return match[1];
+}
+
 export function getPageInfo(elem: Element|null|undefined): PageInfo|null {
     if(!elem) return null;
 
@@ -38,4 +52,51 @@ export function getPageInfo(elem: Element|null|undefined): PageInfo|null {
     }
 
     return { total_pages };
+}
+
+export function getPlayDataIndexData(elem: Element|null|undefined): SDVXMusicPlayDataIndexData|null {
+    if(!elem) return null;
+
+    const [music_elem, ...score_info_elem_list] = elem.querySelectorAll('td');
+
+    const music_link_elem = music_elem.querySelector(".title a");
+    if(!music_link_elem) return null;
+
+    const music_id_match = music_link_elem.getAttribute('href')?.match(/music_id=([A-Za-z0-9_\-=]+)/);
+    if(!music_id_match) return null;
+
+    const music_id = decodeURIComponent(music_id_match[1]);
+
+    const title = music_link_elem.textContent?.trim() ?? "";
+    if(!title) return null;
+
+    const artist = elem.querySelector(".artist")?.textContent?.trim() ?? "";
+    if(!artist) return null;
+
+    const diff_list = score_info_elem_list.map((score_info_elem, ind) => {
+        const mark_img_elem = score_info_elem.querySelector("img[src*='rival_mark']");
+        const mark = parseImageUrlPostfix(mark_img_elem?.getAttribute("src"), "rival_mark_");
+        if(!mark || mark === 'no') return;
+
+        const grade_img_elem = score_info_elem.querySelector("img[src*='rival_grade']");
+        const grade = parseImageUrlPostfix(grade_img_elem?.getAttribute("src"), "rival_grade_");
+        if(!grade || grade === 'no') return;
+
+        const score_txt = score_info_elem.textContent?.trim();
+        if(!score_txt?.match(/\d+/)) return null;
+
+        const score = parseInt(score_txt, 10);
+        if(!Number.isSafeInteger(score) || score < 0) return null;
+
+        return {
+            ind, mark, grade, score,
+        } as const;
+    }).filter((x) => x != null);
+
+    return {
+        music_id,
+        title, artist,
+
+        diff_list,
+    };
 }

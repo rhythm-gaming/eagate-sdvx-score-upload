@@ -28,12 +28,11 @@ export interface SDVXProfile {
 }
 
 export interface SDVXMusicPlayDataIndexData {
-    music_data: {
-        id: string;
-        title: string;
-        artist: string;
-    };
-    chart_list: Array<{
+    music_id: string;
+    title: string;
+    artist: string;
+
+    diff_list: Array<{
         ind: number;
         mark: string;
         grade: string;

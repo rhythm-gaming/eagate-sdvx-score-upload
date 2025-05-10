@@ -1,7 +1,8 @@
-import { EAGATE_ORIGIN, IDENT } from "./core";
+import { EAGATE_ORIGIN, IDENT, UPLOAD_URL } from "./core";
 import { Crawler } from "./crawler";
 import { $ } from "./message";
 import { SDVXCrawlerUI } from "./ui";
+import { Uploader } from "./uploader";
 
 async function main() {
     if(IDENT in window && window[IDENT]) {
@@ -25,10 +26,18 @@ async function main() {
 
     const index_data_list = await crawler.fetchMusicPlayDataIndexDataList({
         limit: 150,
-        parallel: 4,
+        parallel: 3,
         onProgress(total_pages, curr_page) {
             ui.setStatus($('fetching_play_data_index', curr_page, total_pages));
         },
+    });
+
+    ui.setStatus($('uploading_play_data', index_data_list.length));
+
+    const uploader = new Uploader(UPLOAD_URL);
+    await uploader.upload({
+        profile,
+        musics: index_data_list,
     });
 }
 
